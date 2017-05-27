@@ -24,9 +24,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="150dp"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <Button
+         <Button
             android:id="@+id/decrementFood"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -51,6 +51,29 @@
             android:onClick="incrementFood"
             android:text="+"
             android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/foodAmountLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Food Amount (10 - 250g, in increments of 10g)"
+            android:textSize="12sp"/>
+
+        <EditText
+            android:id="@+id/foodData"
+            android:layout_width="85dp"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:maxLines="1" />
+
+        <Button
+            android:id="@+id/send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="alternateSend"
+            android:text="Send" />
     </LinearLayout>
 
 </RelativeLayout>

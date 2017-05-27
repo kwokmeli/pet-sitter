@@ -36,14 +36,14 @@ public class MainActivity extends AppCompatActivity {
     }*/
 
     public void openFeed(View view) {
-        Intent iFeed = new Intent(this, feedActivity.class);
+        Intent iFeed = new Intent(getApplicationContext(), feedActivity.class);
+        iFeed.putExtra("ip", addr);
         startActivity(iFeed);
     }
 
     public void openConnect(View view) {
-        //Intent iConnect = new Intent(this, connectActivity.class);
-        //startActivity(iConnect);
-        String url = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
+        String url = "rtsp://";
+        url = url.concat(addr).concat(":8554/x");
 
         Intent iConnect = new Intent(getApplicationContext(), connectActivity.class);
         iConnect.putExtra("videoUrl", url);
