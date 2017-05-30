@@ -6,6 +6,9 @@ import pigpio
 import Adafruit_PCA9685
 import sys
 
+# 160 == 180 degree
+# 360 == 90 degree
+# 560 == 0 degree
 
 pwm = Adafruit_PCA9685.PCA9685()
 
