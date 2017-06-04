@@ -13,11 +13,11 @@ FOOD_SERVO_PWM_DC=0
 
 WATER_SERVO_PIN=0
 
-WATER_LC_DATA_PIN=18
-WATER_LC_CLOCK_PIN=24
+WATER_LC_DATA_PIN=17
+WATER_LC_CLOCK_PIN=4
 
 WATER_CONTAINER_FULL = 0          # Loadcell reading when water container is FULL
-WATER_BOWL_FULL = 0             # Loadcell reading when water bow is FULL
+WATER_BOWL_FULL = 250766             # Loadcell reading when water bow is FULL
 
 
 pwm = Adafruit_PCA9685.PCA9685()
@@ -44,6 +44,24 @@ def loadCell(food_Amount,data_Pin,clock_Pin):
     return r
 
 
+def loadCell_water(data_Pin,clock_Pin):
+    pi = pigpio.pi()
+    if not pi.connected:
+            exit(0)
+    s = HX711.sensor(pi, DATA=data_Pin, CLOCK=clock_Pin, mode=1, callback=None)
+    s.set_mode(1)
+    s.start()
+    #stop = time.time() + 20
+    r = 0
+    while r <= WATER_BOWL_FULL:
+        c, m, r = s.get_reading()
+        print "LoadCell reading: ", r
+        time.sleep(0.1)
+    s.pause()
+    s.cancel()
+    pi.stop()
+    return r
+
 def dispense_Food(food_Amount):
     print "Tring to dispense: ", food_Amount
     #pwm = Adafruit_PCA9685.PCA9685()
@@ -64,20 +82,26 @@ def dispense_Food(food_Amount):
     return
 '''
 
-def dispense_Water(water_Amount):
+def dispense_Water():
     # pwm_DC = 160 is 0 Degree
     # pwm_DC = 560 is 180 Degree
 
     #pwm = Adafruit_PCA9685.PCA9685()
     #pwm.set_pwm_freq(50)
-    pwm.set_pwm(WATER_SERVO_PIN, 0, 560) # 90 Degree
+    cur_water = get_lc_reading(WATER_LC_DATA_PIN,WATER_LC_CLOCK_PIN)
+    if cur_water >= WATER_BOWL_FULL:
+	print "Already full"
+	return
+
+    pwm.set_pwm(WATER_SERVO_PIN, 0, 540) # 90 Degree
     time.sleep(.5)
-    pwm.set_pwm(WATER_SERVO_PIN, 0, 360) # 90 Degree
+    pwm.set_pwm(WATER_SERVO_PIN, 0, 270) # 90 Degree
     time.sleep(.3)
-    loadCell(water_Amount,FOOD_LC_DATA_PIN,FOOD_LC_CLOCK_PIN)
-    pwm.set_pwm(WATER_SERVO_PIN, 0, 560) # 90 Degree
+    loadCell_water(WATER_LC_DATA_PIN,WATER_LC_CLOCK_PIN)
+    pwm.set_pwm(WATER_SERVO_PIN, 0, 540) # 90 Degree
     time.sleep(.5)
     pwm.set_pwm(WATER_SERVO_PIN, 0, 0)   # Stop pwm wave
+    time.sleep(.5)
     return
 
 '''
@@ -93,7 +117,7 @@ def dispense_Water(water_Amount):
 '''
 
 
-def dispense_Water():
+def dispense_water():
     pwm.set_pwm(WATER_SERVO_PIN, 0, 560) # 0 Degree
     time.sleep(.5) #initialize spigot position
     while water_level() < 100:
@@ -114,7 +138,7 @@ def get_lc_reading(data_Pin,clock_Pin):
     s.start()
     time.sleep(.7)
     c, m, r = s.get_reading()
-	print "LoadCell reading: ", r
+    print "LoadCell reading: ", r
     s.pause()
     s.cancel()
     pi.stop()
