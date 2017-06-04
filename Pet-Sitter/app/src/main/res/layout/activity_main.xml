@@ -144,11 +144,19 @@
                 android:gravity="center"/>
 
             <TextView
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Feed Now"
+                android:textSize="16sp"/>
+
+            <TextView
                 android:id="@+id/foodAmountLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Food Amount (10 - 250g, in increments of 10g)"
+                android:text="Food Amount (10 - 200g, in increments of 10g)"
                 android:textSize="12sp" />
 
             <EditText
@@ -168,7 +176,8 @@
                 android:text="Feed Now" />
 
             <TextView
-                android:paddingTop="20dp"
+                android:paddingTop="30dp"
+                android:paddingBottom="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Set a Schedule"
@@ -259,16 +268,18 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:paddingTop="30dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
                     <TextView
+                        android:textSize="12sp"
                         android:paddingTop="10dp"
-                        android:paddingLeft="30dp"
+                        android:paddingLeft="38dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Number of times per day:"/>
+                        android:text="Number of Times Per Day"/>
 
                     <EditText
                         android:id="@+id/foodTimes"
@@ -283,12 +294,72 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <TextView
+                    android:gravity="center"
+                    android:paddingTop="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="Food Amount (10 - 200g, in increments of 10g)" />
+
+                <EditText
+                    android:id="@+id/foodSchedule"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:maxLines="1"/>
+            </LinearLayout>
+
             <Button
                 android:onClick="setSchedule"
                 android:textSize="12sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Set Schedule"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Water"
+                android:textSize="22sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Water Bowl Refill Delay (minutes)"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/waterData"
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:maxLines="1" />
+
+            <Button
+                android:onClick="waterSend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Change Delay"
+                android:textSize="12sp"/>
 
         </LinearLayout>
 
