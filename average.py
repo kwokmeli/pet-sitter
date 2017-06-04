@@ -8,13 +8,13 @@ import HX711
 pi = pigpio.pi()
 if not pi.connected:
 	exit(0)
-s = HX711.sensor(pi, DATA=4, CLOCK=17, mode=1)
+s = HX711.sensor(pi, DATA=17, CLOCK=4, mode=1)
 
 s.set_mode(1)
 
 s.start()
 time.sleep(0.7)
-stop = time.time() + 30
+stop = time.time() + 300
 lst = []
 while time.time() <= stop:
 	c, m, r = s.get_reading()
