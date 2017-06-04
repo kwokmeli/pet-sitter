@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,7 +8,7 @@
     android:orientation="vertical"
     tools:context="com.example.android.pet_sitter.MainActivity">
 
-    <LinearLayout
+    <!-- <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
@@ -38,7 +38,7 @@
             android:text="Set IP"
             android:textSize="12sp" />
 
-    </LinearLayout>
+    </LinearLayout> -->
 
     <!-- <LinearLayout
         android:layout_width="match_parent"
@@ -63,7 +63,7 @@
 
     </LinearLayout> -->
 
-    <LinearLayout
+    <!-- <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
@@ -83,7 +83,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Water" />
+            android:text="Water"
+            android:onClick="openWater"/>
 
         <Button
             android:id="@+id/connectbutton"
@@ -93,7 +94,222 @@
             android:text="Connect"
             android:onClick="openConnect"/>
 
+    </LinearLayout> -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="15dp">
+
+            <TextView
+                android:id="@+id/updateFood"
+                android:text="Current weight of food: "
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/updateWater"
+                android:text="Current percent of water: "
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/updateTemp"
+                android:text="Current system temperature: "
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/food"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="25dp"
+            android:paddingBottom="25dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Food"
+                android:textSize="22sp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/foodAmountLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Food Amount (10 - 250g, in increments of 10g)"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/foodData"
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:maxLines="1" />
+
+            <Button
+                android:textSize="12sp"
+                android:id="@+id/send"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="foodSend"
+                android:text="Feed Now" />
+
+            <TextView
+                android:paddingTop="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Set a Schedule"
+                android:textSize="16sp"/>
+
+            <LinearLayout
+                android:id="@+id/time"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_gravity="center"
+                    android:id="@+id/hour"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/incrementHour"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:gravity="center"
+                        android:onClick="incrementHour"
+                        android:text="+"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/hourValue"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:gravity="center"
+                        android:text="00"
+                        android:textSize="22sp" />
+
+                    <Button
+                        android:id="@+id/decrementHour"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:gravity="center"
+                        android:onClick="decrementHour"
+                        android:text="-"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=":"
+                    android:textSize="22sp"
+                    android:layout_marginTop="45sp"/>
+
+                <LinearLayout
+                    android:layout_gravity="center"
+                    android:id="@+id/minutes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/incrementMinutes"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:gravity="center"
+                        android:onClick="incrementMinutes"
+                        android:text="+"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/minuteValue"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:gravity="center"
+                        android:text="00"
+                        android:textSize="22sp" />
+
+                    <Button
+                        android:id="@+id/decrementMinutes"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:gravity="center"
+                        android:onClick="decrementMinutes"
+                        android:text="-"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:paddingTop="10dp"
+                        android:paddingLeft="30dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Number of times per day:"/>
+
+                    <EditText
+                        android:id="@+id/foodTimes"
+                        android:layout_marginLeft="80dp"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionDone"
+                        android:inputType="text"
+                        android:maxLines="1"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <Button
+                android:onClick="setSchedule"
+                android:textSize="12sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Set Schedule"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/connect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/connectButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Connect"
+                android:textSize="18sp"
+                android:onClick="openConnect"/>
+        </LinearLayout>
+
     </LinearLayout>
 
 
-</LinearLayout>
+
+</ScrollView>
