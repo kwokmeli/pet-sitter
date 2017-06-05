@@ -69,12 +69,10 @@ public class MainActivity extends AppCompatActivity {
             while (!Thread.currentThread().isInterrupted()) {
 
                 try {
-
                     socket = serverSocket.accept();
 
                     CommunicationThread commThread = new CommunicationThread(socket);
                     new Thread(commThread).start();
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
