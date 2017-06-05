@@ -19,7 +19,8 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
-    String addr = "192.168.0.66";
+    //addr = ip address of rpi
+    String addr = "173.250.183.115";
     int hourValue = 0;
     int minuteValue = 0;
 
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private ServerSocket serverSocket;
     Handler updateConversationHandler;
     Thread serverThread = null;
-    private TextView text;
+    //private TextView text;
     public static final int SERVERPORT = 9999;
     //new
 
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //new
-        text = (TextView) findViewById(R.id.text2);
+        //text = (TextView) findViewById(R.id.text2);
         updateConversationHandler = new Handler();
         this.serverThread = new Thread(new ServerThread());
         this.serverThread.start();
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //new
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -83,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
     class CommunicationThread implements Runnable {
 
         private Socket clientSocket;
-
         private BufferedReader input;
 
         public CommunicationThread(Socket clientSocket) {
@@ -107,11 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
                     String read = input.readLine();
                     if (read != null) {
-                        if (read.equals("hello")) {
-                            updateConversationHandler.post(new updateUIThread("i saw hello"));
-                        } else {
-                            updateConversationHandler.post(new updateUIThread(read));
-                        }
+                        updateConversationHandler.post(new updateUIThread(read));
                     }
 
                 } catch (IOException e) {
@@ -131,8 +128,22 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void run() {
-            TextView currentDisplay = (TextView) findViewById(R.id.updateWater);
-            currentDisplay.setText("Current percent of water: " + msg);
+            String delims = "[,]";
+            TextView foodDisplay = (TextView) findViewById(R.id.updateFood);
+            TextView waterDisplay = (TextView) findViewById(R.id.updateWater);
+            TextView tempDisplay = (TextView) findViewById(R.id.updateTemp);
+
+            String[] tokens = msg.split(delims);
+
+            if (tokens[0].equals("FOOD")) {
+                foodDisplay.setText("Current weight of food: " + tokens[1] + " g");
+            } else if (tokens[0].equals("WATER")) {
+                waterDisplay.setText("Current percent of water: " + tokens[1] + "%");
+            } else {
+                tempDisplay.setText("Current system temperature: " + tokens[1] + "C");
+            }
+
+            //waterDisplay.setText("Current percent of water: " + msg);
             //text.setText(text.getText().toString()+"Client Says: "+ msg + "\n");
         }
     }
@@ -177,7 +188,17 @@ public class MainActivity extends AppCompatActivity {
         startActivity(iConnect);
     }
 
-    /**************FOOD*************/
+    /********************************
+     *                              *
+     *                              *
+     *                              *
+     *                              *
+     *             FOOD             *
+     *                              *
+     *                              *
+     *                              *
+     *                              *
+     ********************************/
     public void incrementHour (View v) {
         if (hourValue < 23) {
             hourValue = hourValue + 1;
@@ -242,10 +263,10 @@ public class MainActivity extends AppCompatActivity {
         if ( Pattern.matches("[0-9]+", strWeight) ) {
             weight = Integer.parseInt(strWeight);
 
-            if ((weight >= 10) && (weight <= 250) && (weight%10 == 0)) {
+            if ((weight >= 10) && (weight <= 200) && (weight%10 == 0)) {
                 msg = Toast.makeText(getBaseContext(), "Amount valid.", Toast.LENGTH_LONG);
                 msg.show();
-                DataPackage data = new DataPackage(addr, strWeight);
+                DataPackage data = new DataPackage(addr, "FOOD," + strWeight);
                 new SendMessage().execute(data);
                 textGrab.getText().clear();
             } else {
@@ -261,30 +282,86 @@ public class MainActivity extends AppCompatActivity {
 
     public void setSchedule(View v) {
         int times;
+        int weight;
         Toast msgTimes;
-        EditText textGrab = (EditText) findViewById(R.id.foodTimes);
-        String strTimes = textGrab.getText().toString();
+        EditText textGrab1 = (EditText) findViewById(R.id.foodTimes);
+        EditText textGrab2 = (EditText) findViewById(R.id.foodSchedule);
+        String strTimes = textGrab1.getText().toString();
+        String strWeight = textGrab2.getText().toString();
 
         // Check if input is numerical AND an integer to prevent crashes
-        if ( Pattern.matches("[0-9]+", strTimes) ) {
+        if ( Pattern.matches("[0-9]+", strTimes) && (Pattern.matches("[0-9]+", strWeight)) ) {
             times = Integer.parseInt(strTimes);
+            weight = Integer.parseInt(strWeight);
 
-            if ((times >= 1) && (times <= 24)) {
-                msgTimes = Toast.makeText(getBaseContext(), "Number of times valid.", Toast.LENGTH_LONG);
+            if ((times >= 1) && (times <= 24) && (weight >= 10) && (weight <= 200) && (weight % 10 == 0)) {
+                msgTimes = Toast.makeText(getBaseContext(), "Schedule valid.", Toast.LENGTH_LONG);
                 msgTimes.show();
-                DataPackage dataTimes = new DataPackage(addr, hourValue + ":" + minuteValue + "times" + strTimes);
-                new SendMessage().execute(dataTimes);
-                textGrab.getText().clear();
-            } else {
+
+                if (minuteValue < 10) {
+                    DataPackage dataTimes = new DataPackage(addr, "START," + hourValue + ":0" + minuteValue + ",FREQ," + strTimes + ",FOOD," + strWeight);
+                    new SendMessage().execute(dataTimes);
+                } else {
+                    DataPackage dataTimes = new DataPackage(addr, "START," + hourValue + ":" + minuteValue + ",FREQ," + strTimes + ",FOOD," + strWeight);
+                    new SendMessage().execute(dataTimes);
+                }
+
+                textGrab1.getText().clear();
+                textGrab2.getText().clear();
+            } else if ( (times < 1) || (times > 24) ){
                 msgTimes = Toast.makeText(getBaseContext(), "Please enter a number between 1 and 24.", Toast.LENGTH_LONG);
+                msgTimes.show();
+            } else if ( (weight < 10) || (weight > 200) || (weight % 10 != 0)) {
+                msgTimes = Toast.makeText(getBaseContext(), "Please enter a number between 10 and 200.", Toast.LENGTH_LONG);
                 msgTimes.show();
             }
         } else {
-            msgTimes = Toast.makeText(getBaseContext(), "Please enter a valid numerical value.", Toast.LENGTH_LONG);
+            msgTimes = Toast.makeText(getBaseContext(), "Please enter valid numerical values.", Toast.LENGTH_LONG);
             msgTimes.show();
         }
     }
+    /********************************/
+
+    /********************************
+     *                              *
+     *                              *
+     *                              *
+     *                              *
+     *            WATER             *
+     *                              *
+     *                              *
+     *                              *
+     *                              *
+     ********************************/
+    public void waterSend(View v) {
+        int delay;
+        Toast msgDelay;
+        EditText textGrab = (EditText) findViewById(R.id.waterData);
+        String strDelay = textGrab.getText().toString();
+
+        // Check if input is numerical to prevent crashes
+        if ( Pattern.matches("[0-9]+", strDelay) ) {
+            delay = Integer.parseInt(strDelay);
+
+            if ((delay >= 0) && (delay <= 10)) {
+                msgDelay = Toast.makeText(getBaseContext(), "Amount valid.", Toast.LENGTH_LONG);
+                msgDelay.show();
+                DataPackage data = new DataPackage(addr, "WATER," + strDelay);
+                new SendMessage().execute(data);
+                textGrab.getText().clear();
+            } else {
+                msgDelay = Toast.makeText(getBaseContext(), "Please enter a valid amount.", Toast.LENGTH_LONG);
+                msgDelay.show();
+            }
+
+        } else {
+            msgDelay = Toast.makeText(getBaseContext(), "Please enter a valid number of minutes.", Toast.LENGTH_LONG);
+            msgDelay.show();
+        }
+    }
     /*********************************/
+
+
 
 
 }
