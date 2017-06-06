@@ -6,8 +6,11 @@ import pigpio
 import Adafruit_PCA9685
 import statistics
 
-FOOD_LC_DATA_PIN=6
-FOOD_LC_CLOCK_PIN=5
+FOOD_LC_DATA_PIN=13 #FOOD Bowl
+FOOD_LC_CLOCK_PIN=12 #FOOD Bowl
+
+FOOD_CONTAINER_LC_DATA_PIN=6
+FOOD_CONTAINER_LC_CLOCK_PIN=5
 
 FOOD_SERVO_PIN=1
 FOOD_SERVO_PWM_DC=320
@@ -17,12 +20,16 @@ FOOD_AGI_SERVO_PWM_DC=400
 
 WATER_SERVO_PIN=0
 
-WATER_LC_DATA_PIN=4
-WATER_LC_CLOCK_PIN=17
+WATER_LC_DATA_PIN=17 # Water Container
+WATER_LC_CLOCK_PIN=4 # Water Container
 
-WATER_CONTAINER_FULL = 0          # Loadcell reading when water container is FULL
+WATER_BOWL_LC_DATA_PIN=27
+WATER_BOWL_LC_CLOCK_PIN=18
+
+WATER_CONTAINER_FULL = 1459416          # Loadcell reading when water container is FULL
 WATER_CONTAINER_EMPTY = 276848
 WATER_BOWL_FULL = 250766             # Loadcell reading when water bow is FULL
+WATER_BOWL_EMPTY = 179909
 
 FOOD_BOWL_EMPTY = -75618
 FOOD_BOWL_FULL = -27180 - FOOD_BOWL_EMPTY
@@ -42,16 +49,17 @@ def loadCell_Food(cur_food,food_amount,data_Pin,clock_Pin):
     s.start()
     time.sleep(0.7)
     if cur_food <= 0:
-	"Food bowl is currently empty"
+	print "Food bowl is currently empty"
         threshold = food_amount
     else:
-	"Food bowl contains", cur_food, "amount of food, adding", food__amount, "more."
+	print "Food bowl contains", cur_food, "amount of food, adding", food_amount, "more."
 	threshold = cur_food + food_amount
     print "cur_food", cur_food
     print "food_amount", food_amount
     print "threshold: ", threshold
     buff = [None]*30
     i = 0
+    r = -9999999
     while r <= threshold:
         c, m, r = s.get_reading()
 	if r != None:
@@ -104,7 +112,7 @@ def fix_Jam():
 def loadCell_Water(data_Pin,clock_Pin):
     pi = pigpio.pi()
     if not pi.connected:
-            exit(0)
+        exit(0)
     s = HX711.sensor(pi, DATA=data_Pin, CLOCK=clock_Pin, mode=1, callback=None)
     s.set_mode(1)
     s.start()
@@ -112,6 +120,22 @@ def loadCell_Water(data_Pin,clock_Pin):
     r = 0
     while r <= WATER_BOWL_FULL:
         c, m, r = s.get_reading()
+        count = 0
+        while r == None:
+            c, m, r = s.get_reading()
+            time.sleep(0.1)
+            count+=1
+            if count >= 20:
+                print "loadcell stucked"
+                print "restart load cell"
+                s.pause()
+                s.cancel()
+                s = HX711.sensor(pi, DATA=data_Pin, CLOCK=clock_Pin, mode=1, callback=None)
+                s.set_mode(1)
+                s.start()
+                time.sleep(0.7)
+                c, m, r = s.get_reading()
+                count = 0
         print "LoadCell reading: ", r
         time.sleep(0.1)
     s.pause()
@@ -150,16 +174,17 @@ def dispense_Water():
     # pwm_DC = 160 is 0 Degree
     # pwm_DC = 560 is 180 Degree
 
-    cur_water = get_lc_reading(WATER_LC_DATA_PIN,WATER_LC_CLOCK_PIN)
+    cur_water = get_lc_reading(WATER_BOWL_LC_DATA_PIN,WATER_BOWL_LC_CLOCK_PIN)
     if cur_water >= WATER_BOWL_FULL:
 	print "Already full"
 	return
 
+    print "Dispensing water"
     pwm.set_pwm(WATER_SERVO_PIN, 0, 540) # 0 Degree
     time.sleep(.5)
     pwm.set_pwm(WATER_SERVO_PIN, 0, 270) # 90 Degree
     time.sleep(.3)
-    loadCell_Water(WATER_LC_DATA_PIN,WATER_LC_CLOCK_PIN)
+    loadCell_Water(WATER_BOWL_LC_DATA_PIN,WATER_BOWL_LC_CLOCK_PIN)
     pwm.set_pwm(WATER_SERVO_PIN, 0, 540) # 0 Degree
     time.sleep(.5)
     pwm.set_pwm(WATER_SERVO_PIN, 0, 0)   # Stop pwm wave
@@ -183,39 +208,69 @@ def dispense_water():
 def get_lc_reading(data_Pin,clock_Pin):
     pi = pigpio.pi()
     if not pi.connected:
-            exit(0)
+        exit(0)
     s = HX711.sensor(pi, DATA=data_Pin, CLOCK=clock_Pin, mode=1, callback=None)
     s.set_mode(1)
     s.start()
     time.sleep(0.7)
     c, m, r = s.get_reading()
+    count = 0
     while r == None:
 	c, m, r = s.get_reading()
 	time.sleep(0.1)
+        count+=1
+        if count >= 20:
+            print "loadcell stucked"
+            print "restart load cell"
+            s.pause()
+            s.cancel()
+            s = HX711.sensor(pi, DATA=data_Pin, CLOCK=clock_Pin, mode=1, callback=None)
+            s.set_mode(1)
+            s.start()
+            time.sleep(0.7)
+            c, m, r = s.get_reading()
+            count = 0
     print "LoadCell reading: ", r
     s.pause()
     s.cancel()
     pi.stop()
     return r
 
-def water_level():
+def water_Level_Container():
     reading = get_lc_reading(WATER_LC_DATA_PIN,WATER_LC_CLOCK_PIN)
-    water_level = (reading/WATER_FULL)*100
+    water_level = (reading/WATER_CONTAINER_FULL)*100
     if water_level >= 100:
         return 100
     else:
         return water_level
 
-def check_Water():
-    if water_level() < 75:
-        time.sleep(60)      # delay 1 min
+
+def water_Level_Bowl():
+    reading = get_lc_reading(WATER_BOWL_LC_DATA_PIN,WATER_BOWL_LC_CLOCK_PIN)
+    water_level = (reading/WATER_BOWL_FULL)*100
+    if water_level >= 100:
+        return 100
+    else:
+        return water_level
+
+
+def food_Weight_Container():
+    reading = get_lc_reading(FOOD_CONTAINER_LC_DATA_PIN,FOOD_CONTAINER_LC_CLOCK_PIN)
+    reading = convert_Gram(reading)
+    print "Food container has", reading, "g of food"
+    return reading
+
+def check_Water_Bowl():
+    if water_Level_Bowl() < 75:
+        print "Water less than 75%"
+#        time.sleep(60)      # delay 1 min
         dispense_Water()
         return
     else:
         return
 
 def low_Water_Warning():
-    if water_level() < 10:
+    if water_Level_Container() < 10:
 	print "WARNING: Refill water in the container"
     return 
 
@@ -235,3 +290,18 @@ def stop_Servos():
     time.sleep(0.5)
     pwm.set_pwm(FOOD_SERVO_PIN, 0, 0)
     time.sleep(0.5)
+
+def get_Tmp():
+    adc = Adafruit_ADS1x15.ADS1115()
+    GAIN = 4
+    value = []
+    for i in range(0,10):
+        tmp = adc.read_adc(0, gain=GAIN)
+        value.append(tmp)
+        time.sleep(0.1)
+    mean = statistics.mean(value)
+    v = mean / 32767.0 * 1.024
+    delta_v = (750 - v*1000) / 10
+    res = 25 - delta_v
+    return res 
+

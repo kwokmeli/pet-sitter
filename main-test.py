@@ -3,10 +3,31 @@ import sys
 import PF_Functions as PF
 import time
 
+APP_IP_ADDR='172.20.10.10'
+
+def send_Water_Container_Status():
+#    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#    s.connect((APP_IP_ADDR, 9999))
+    message = PF.water_Level_Container()
+    print 'Sending Water Container Level:',message
+#    s.sendall("WATER," + str(message) + "\n")
+#    s.close()
+    return
+
+def send_Food_Container_Status():
+ #   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+ #   s.connect((APP_IP_ADDR, 9999))
+    message = PF.food_Weight_Container()
+    print 'Sending Food Container Weight:',message
+ #   s.sendall("FOOD," + str(message) + "\n")
+ #   s.close()
+    return
+
+
 SCHEDULE_ON = 0
 
-#HOST = '172.20.10.9'
-HOST = '173.250.183.115'
+HOST = '172.20.10.9'
+#HOST = '173.250.183.115'
 PORT = 9999
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -31,7 +52,13 @@ print 'Socket bind successful.'
 s.listen(5)
 print 'Socket is now listening.'
 
+t = time.time()
 while 1:
+    if time.time() - t >= 10:
+        print "Sending status"
+        send_Water_Container_Status()
+        send_Food_Container_Status()
+        t = time.time()
 
     if SCHEDULE_ON:
 	print "Schedule is on"
@@ -42,13 +69,21 @@ while 1:
 #	print "scheduled time is ", start_hour, start_min
 	if hour == start_hour and min == start_min:
 	    print "Scheduled dispensing"
-#	    PF.dispense_Food(amount)
+	    PF.dispense_Food(amount)
 	    start_hour += interval_hour
 	    if start_hour >= 24:
 	        start_hour %= 24
 	    start_min += interval_min
+            if start_min >= 60:
+                start_hour += 1
+                start_min %= 60
 	    print "Finished dispensing"
 	    print "next feeding time is ", start_hour, ":", start_min
+
+    PF.check_Water_Bowl()
+    PF.low_Water_Warning()
+    PF.low_Food_Warning()
+
     try:
         conn, addr = s.accept()
         print 'Connect with ' + addr[0] + ':' + str(addr[1])
@@ -64,7 +99,7 @@ while 1:
 	        delay = int(command[1])
 	        print "Dispensing water to full in ", delay, " seconds"
 		time.sleep(delay)
-#	        PF.dispense_Water()
+	        PF.dispense_Water()
         elif len(command) == 6:
 	    schedule = command[1].split(":")
 	    start_hour = int(schedule[0])
