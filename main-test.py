@@ -3,24 +3,18 @@ import sys
 import PF_Functions as PF
 import time
 
-APP_IP_ADDR='172.20.10.10'
+APP_IP_ADDR='69.91.185.87'
 
 def send_Water_Container_Status():
-#    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#    s.connect((APP_IP_ADDR, 9999))
     message = PF.water_Level_Container()
+    new_s.sendall("STORAGE-WATER," + str(message) + "\n")
     print 'Sending Water Container Level:',message
-#    s.sendall("WATER," + str(message) + "\n")
-#    s.close()
     return
 
 def send_Food_Container_Status():
- #   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
- #   s.connect((APP_IP_ADDR, 9999))
     message = PF.food_Weight_Container()
     print 'Sending Food Container Weight:',message
- #   s.sendall("FOOD," + str(message) + "\n")
- #   s.close()
+    new_s.sendall("STORAGE-FOOD," + str(message) + "\n")
     return
 
 
@@ -33,6 +27,8 @@ PORT = 9999
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 s.settimeout(0.5)
+new_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+new_s.connect((APP_IP_ADDR, 9999))
 # socket.socket: create socket
 # socket.AF_INET: address format, internet = ip addresses
 # socket.SOCK_STREAM: two-way connection-based byte streams
@@ -52,8 +48,11 @@ print 'Socket bind successful.'
 s.listen(5)
 print 'Socket is now listening.'
 
+
+sys_temperature = PF.getTmp()
 t = time.time()
-while 1:
+while sys_tmperature < 50.0:
+
     if time.time() - t >= 10:
         print "Sending status"
         send_Water_Container_Status()
@@ -80,9 +79,7 @@ while 1:
 	    print "Finished dispensing"
 	    print "next feeding time is ", start_hour, ":", start_min
 
-    PF.check_Water_Bowl()
-    PF.low_Water_Warning()
-    PF.low_Food_Warning()
+    PF.check_Water_Bowl()       # Checks if the water bowl contains more than 75% of water
 
     try:
         conn, addr = s.accept()

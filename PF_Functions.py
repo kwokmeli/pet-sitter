@@ -39,6 +39,8 @@ print "pwm object created:"
 pwm.set_pwm_freq(50)
 print "pwm frequency set to 50 Hz"
 
+adc = Adafruit_ADS1x15.ADS1115()
+
 def loadCell_Food(cur_food,food_amount,data_Pin,clock_Pin):
     print "in loadCell_Food()"
     pi = pigpio.pi()
