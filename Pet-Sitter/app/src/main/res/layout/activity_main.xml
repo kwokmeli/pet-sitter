@@ -109,18 +109,21 @@
             android:paddingTop="15dp">
 
             <TextView
+                android:freezesText="true"
                 android:id="@+id/updateFood"
                 android:text="Current weight of food: "
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <TextView
+                android:freezesText="true"
                 android:id="@+id/updateWater"
                 android:text="Current percent of water: "
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <TextView
+                android:freezesText="true"
                 android:id="@+id/updateTemp"
                 android:text="Current system temperature: "
                 android:layout_width="wrap_content"
@@ -364,6 +367,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:paddingTop="30dp"
             android:orientation="vertical"
             android:id="@+id/connect"
             android:layout_width="match_parent"
@@ -377,6 +381,87 @@
                 android:text="Connect"
                 android:textSize="18sp"
                 android:onClick="openConnect"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:paddingTop="30dp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:text="Food Calculator"
+                android:gravity="center"
+                android:textSize="22sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:textSize="12sp"
+                    android:text="Weight of Pet (lbs):"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:id="@+id/petWeight"
+                    android:layout_width="65dp"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:maxLines="1" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="Caloric Density (cal/g):"/>
+
+                <EditText
+                    android:layout_width="65dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/calories"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:maxLines="1" />
+
+                <Button
+                    android:onClick="calculate"
+                    android:text="Set"
+                    android:textSize="12sp"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:paddingBottom="30dp"
+                android:paddingTop="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:textSize="12sp"
+                    android:text="Recommended amount:"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:text=""
+                    android:textSize="12sp"
+                    android:id="@+id/recommendedDose"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+
         </LinearLayout>
 
     </LinearLayout>
