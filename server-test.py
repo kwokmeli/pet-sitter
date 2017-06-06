@@ -1,8 +1,19 @@
 import socket
 import sys
 
-#HOST = '172.20.10.9'
-HOST = '173.250.183.115'
+APP_IP_ADDR="IP"
+
+def new_Socket():
+    new_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    new_s.connect((APP_IP_ADDR, 9999))
+    message = "Hi"
+    new_s.sendall(message + "\n")
+    new_s.close()
+    return
+
+
+HOST = '172.20.10.9'
+#HOST = '173.250.183.115'
 PORT = 9999
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -29,7 +40,7 @@ print 'Socket is now listening.'
 
 while 1:
     print "hello"
-
+    new_Socket()
     try:
 	conn, addr = s.accept()
     	print 'Connect with ' + addr[0] + ':' + str(addr[1])
