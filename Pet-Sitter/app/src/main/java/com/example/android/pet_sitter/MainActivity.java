@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class MainActivity extends AppCompatActivity {
 
     //addr = ip address of rpi
-    String addr = "173.250.183.115";
+    String addr = "172.20.10.9";
     int hourValue = 0;
     int minuteValue = 0;
 
@@ -150,10 +150,14 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void run() {
+            int foodStorage;
+            int waterStorage;
             String delims = "[,]";
             TextView foodDisplay = (TextView) findViewById(R.id.updateFood);
             TextView waterDisplay = (TextView) findViewById(R.id.updateWater);
             TextView tempDisplay = (TextView) findViewById(R.id.updateTemp);
+            TextView foodWarning = (TextView) findViewById(R.id.foodWarning);
+            TextView waterWarning = (TextView) findViewById(R.id.waterWarning);
 
             String[] tokens = msg.split(delims);
 
@@ -161,8 +165,24 @@ public class MainActivity extends AppCompatActivity {
                 foodDisplay.setText("Current weight of food: " + tokens[1] + " g");
             } else if (tokens[0].equals("WATER")) {
                 waterDisplay.setText("Current percent of water: " + tokens[1] + "%");
+            } else if (tokens[0].equals("TEMP")){
+                tempDisplay.setText("Current system temperature: " + tokens[1] + "°C");
+            } else if (tokens[0].equals("STORAGE-FOOD")) {
+                foodStorage = Integer.parseInt(tokens[1]);
+                if (foodStorage < 400) {
+                    foodWarning.setText("Warning: Low food. Only " + tokens[1] + " grams left.");
+                } else {
+                    foodWarning.setText("");
+                }
+            } else if (tokens[0].equals("STORAGE-WATER")) {
+                waterStorage = Integer.parseInt(tokens[1]);
+                if (waterStorage < 25) {
+                    waterWarning.setText("Warning: Low water. Only " + tokens[1] + "% left.");
+                } else {
+                    waterWarning.setText("");
+                }
             } else {
-                tempDisplay.setText("Current system temperature: " + tokens[1] + "C");
+
             }
 
             //waterDisplay.setText("Current percent of water: " + msg);
@@ -414,12 +434,15 @@ public class MainActivity extends AppCompatActivity {
         if ( (Pattern.matches("[0-9]+", strWeight)) && (Pattern.matches("[0-9]+", strCalories)) ) {
             weight = Double.parseDouble(strWeight);
             calories = Double.parseDouble(strCalories);
-            amount = (int) weight * 30 / (int) calories;
+            if (calories == 0.0) {
+                msg = Toast.makeText(getBaseContext(), "Please enter a valid caloric density.", Toast.LENGTH_LONG);
+                msg.show();
+            } else {
+                amount = (int) weight * 30 / (int) calories;
 
-            TextView amountDisplay = (TextView) findViewById(R.id.recommendedDose);
-            amountDisplay.setText(" " + amount + " g");
-
-
+                TextView amountDisplay = (TextView) findViewById(R.id.recommendedDose);
+                amountDisplay.setText(" " + amount + " g");
+            }
 
         } else if ( !(Pattern.matches("[0-9]+", strWeight)) ){
             msg = Toast.makeText(getBaseContext(), "Please enter a valid weight.", Toast.LENGTH_LONG);
