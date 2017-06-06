@@ -1,7 +1,7 @@
-import socket 
+ import socket 
 import sys
 
-APP_IP_ADDR="172.20.10.11"
+APP_IP_ADDR="69.91.185.87"
 
 def new_Socket(i):
     message = "FOOD," + str(i)
@@ -11,7 +11,7 @@ def new_Socket(i):
     return
 
 
-HOST = '172.20.10.9'
+HOST = '108.179.184.39'
 #HOST = '173.250.183.115'
 PORT = 9999
 

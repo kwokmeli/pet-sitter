@@ -26,13 +26,17 @@ WATER_LC_CLOCK_PIN=4 # Water Container
 WATER_BOWL_LC_DATA_PIN=27
 WATER_BOWL_LC_CLOCK_PIN=18
 
-WATER_CONTAINER_FULL = 1459416          # Loadcell reading when water container is FULL
-WATER_CONTAINER_EMPTY = 276848
-WATER_BOWL_FULL = 250766             # Loadcell reading when water bow is FULL
-WATER_BOWL_EMPTY = 179909
+WATER_CONTAINER_FULL=1459416          # Loadcell reading when water container is FULL
+WATER_CONTAINER_EMPTY=276848
+WATER_BOWL_FULL=250766             # Loadcell reading when water bow is FULL
+WATER_BOWL_EMPTY=179909
 
-FOOD_BOWL_EMPTY = -75618
-FOOD_BOWL_FULL = -27180 - FOOD_BOWL_EMPTY
+FOOD_BOWL_EMPTY=-75618
+FOOD_BOWL_FULL=-27180 - FOOD_BOWL_EMPTY
+
+FOOD_CONTAINER_FULL=0
+FOOD_CONTAINER_EMPTY=394673
+
 
 pwm = Adafruit_PCA9685.PCA9685()
 print "pwm object created:"
@@ -150,7 +154,7 @@ def dispense_Food(food_Amount):
     print "Tring to dispense: ", food_Amount
     cur_food = get_lc_reading(FOOD_LC_DATA_PIN,FOOD_LC_CLOCK_PIN)
     cur_food -= FOOD_BOWL_EMPTY
-    food_Amount = convert_LC(food_Amount) 
+    food_Amount = convert_LC_Food_Bowl(food_Amount) 
     food_Amount -= FOOD_BOWL_EMPTY
     if cur_food >= FOOD_BOWL_FULL:
     	print "Already Full"
@@ -258,9 +262,22 @@ def water_Level_Bowl():
 
 def food_Weight_Container():
     reading = get_lc_reading(FOOD_CONTAINER_LC_DATA_PIN,FOOD_CONTAINER_LC_CLOCK_PIN)
-    reading = convert_Gram(reading)
+    reading = convert_Gram_Food_Container(reading)
+    if reading < 0:
+        reading = 0
     print "Food container has", reading, "g of food"
     return reading
+
+
+def food_Weight_Bowl():
+    reading = get_lc_reading(FOOD_LC_DATA_PIN,FOOD_LC_CLOCK_PIN)
+    reading = convert_Gram_Food_Bowl(reading)
+    if reading < 0:
+        reading = 0
+    print "Food container has", reading, "g of food"
+    return reading
+
+
 
 def check_Water_Bowl():
     if water_Level_Bowl() < 75:
@@ -279,13 +296,20 @@ def low_Water_Warning():
 def low_Food_Warning():
     return
 
-def convert_LC(gram):
+def convert_LC_Food_Bowl(gram):
     print gram, " in LC reading is", gram*222.94 - 75648
     return gram*222.94 - 75648
 
-def convert_Gram(lc_reading):
-    print lc_reading, " in gram is", (lc_reading + 75648) / 222.94
-    return (lc_reading + 75648) / 222.94
+def convert_Gram_Food_Container(lc_reading):
+    gram = (lc_reading -394370) / 217.98
+    print "Food loadcell reads:",lc_reading, "in gram is", gram
+    return gram
+
+def convert_Gram_Food_Bowl(lc_reading):
+    gram = (lc_reading + 75648) / 222.94
+    print "Food loadcell reads:",lc_reading, "in gram is", gram
+    return gram
+
 
 def stop_Servos():
     pwm.set_pwm(FOOD_AGI_SERVO_PIN, 0, 0)
