@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -47,6 +48,27 @@ public class MainActivity extends AppCompatActivity {
 
     //new
 
+    /* try
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        try {
+            serverSocket.close();
+            Log.d("test", "activity destroyed and socket closed");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }*/
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateConversationHandler = new Handler();
+        this.serverThread = new Thread(new ServerThread());
+        this.serverThread.start();
+        Log.d("test", "activity resumed");
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -88,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         public CommunicationThread(Socket clientSocket) {
 
             this.clientSocket = clientSocket;
-
+            Log.d("test", "made new socket");
             try {
 
                 this.input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
@@ -99,20 +121,22 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void run() {
-
+            Log.d("test", "running");
             while (!Thread.currentThread().isInterrupted()) {
 
                 try {
-
                     String read = input.readLine();
+                    Log.d("test", "read in: " + read);
                     if (read != null) {
                         updateConversationHandler.post(new updateUIThread(read));
                     }
 
                 } catch (IOException e) {
                     e.printStackTrace();
+                    Log.e("test", "", e);
                 }
             }
+            Log.d("test", "i was interrupted!");
         }
 
     }
@@ -358,6 +382,47 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     /*********************************/
+
+    /********************************
+     *                              *
+     *                              *
+     *                              *
+     *                              *
+     *          CALCULATOR          *
+     *                              *
+     *                              *
+     *                              *
+     *                              *
+     ********************************/
+
+    public void calculate(View v) {
+        double weight;
+        double calories;
+        int amount;
+        Toast msg;
+        EditText textGrab = (EditText) findViewById(R.id.petWeight);
+        String strWeight = textGrab.getText().toString();
+        EditText textGrab2 = (EditText) findViewById(R.id.calories);
+        String strCalories = textGrab2.getText().toString();
+
+        if ( (Pattern.matches("[0-9]+", strWeight)) && (Pattern.matches("[0-9]+", strCalories)) ) {
+            weight = Double.parseDouble(strWeight);
+            calories = Double.parseDouble(strCalories);
+            amount = (int) weight * 30 / (int) calories;
+
+            TextView amountDisplay = (TextView) findViewById(R.id.recommendedDose);
+            amountDisplay.setText(" " + amount + " g");
+
+
+
+        } else if ( !(Pattern.matches("[0-9]+", strWeight)) ){
+            msg = Toast.makeText(getBaseContext(), "Please enter a valid weight.", Toast.LENGTH_LONG);
+            msg.show();
+        } else {
+            msg = Toast.makeText(getBaseContext(), "Please enter a valid caloric density.", Toast.LENGTH_LONG);
+            msg.show();
+        }
+    }
 
 
 
