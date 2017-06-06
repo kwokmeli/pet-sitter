@@ -201,6 +201,13 @@ public class MainActivity extends AppCompatActivity {
         startActivity(iWater);
     }*/
 
+    public void ready(View v) {
+        DataPackage data = new DataPackage(addr, "ready");
+        new SendMessage().execute(data);
+        Toast msg = Toast.makeText(getBaseContext(), "System ready to receive commands.", Toast.LENGTH_LONG);
+        msg.show();
+    }
+
     public void openConnect(View view) {
         String url = "rtsp://";
         url = url.concat(addr).concat(":8554/x");
@@ -394,7 +401,6 @@ public class MainActivity extends AppCompatActivity {
      *                              *
      *                              *
      ********************************/
-
     public void calculate(View v) {
         double weight;
         double calories;

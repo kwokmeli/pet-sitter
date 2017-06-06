@@ -108,7 +108,14 @@
             android:gravity="center"
             android:paddingTop="15dp">
 
+            <Button
+                android:onClick="ready"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ready"/>
+
             <TextView
+                android:paddingTop="15dp"
                 android:freezesText="true"
                 android:id="@+id/updateFood"
                 android:text="Current weight of food: "
@@ -128,6 +135,21 @@
                 android:text="Current system temperature: "
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/foodWarning"
+                android:text=""
+                android:textColor="@android:color/holo_red_dark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/waterWarning"
+                android:text=""
+                android:textColor="@android:color/holo_red_dark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
 
         <LinearLayout
